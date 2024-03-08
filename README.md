@@ -2,5 +2,5 @@ Official pytorch code of our paper "MiM-ISTD: Mamba-in-Mamba for Efficient Infra
 
 http://arxiv.org/abs/2403.02148
 
-![image](https://github.com/txchen-USTC/MiM-ISTD/overview.jpg)
+![image](https://github.com/txchen-USTC/MiM-ISTD/blob/main/overview.jpg)
 
