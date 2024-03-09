@@ -4,7 +4,7 @@ http://arxiv.org/abs/2403.02148
 
 ![image](https://github.com/txchen-USTC/MiM-ISTD/blob/main/overview.jpg)
 
-# Required Environments:
+## Required Environments
 
 ```
 conda create -n vmunet python=3.8
@@ -22,7 +22,7 @@ pip install scikit-learn matplotlib thop h5py SimpleITK scikit-image medpy yacs
 
 The .whl files of causal_conv1d and mamba_ssm could be found here. {[Baidu](https://pan.baidu.com/s/1Uza8g1pkVcbXG1F-2tB0xQ?pwd=p3h9)}
 
-# Citation:
+## Citation
 
 Please cite our paper if you find the repository helpful.
 
