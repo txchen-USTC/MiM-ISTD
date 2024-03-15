@@ -8,7 +8,13 @@ http://arxiv.org/abs/2403.02148
 
 * 24-03-08. Our paper has been released on arXiv.
 
+## A Quick Overview
+
 ![image](https://github.com/txchen-USTC/MiM-ISTD/blob/main/overview.jpg)
+
+## Efficiency Advantages
+
+![image](https://github.com/txchen-USTC/MiM-ISTD/blob/main/efficiency.jpg)
 
 ## Required Environments
 
