@@ -413,7 +413,7 @@ class Stem(nn.Module):
         self.img_size = img_size
         self.inner_dim = inner_dim
         self.num_patches = img_size[0] // 8 * img_size[1] // 8
-        self.num_words = 16#    #if outer h/4,w/4 ---4, outer h/8,w/8 ---16, outer h/16,w/16 ---64
+        self.num_words = 16
         
         self.common_conv = nn.Sequential(
             nn.Conv2d(in_chans, inner_dim*2, 3, stride=2, padding=1),
@@ -437,13 +437,11 @@ class Stem(nn.Module):
             nn.ReLU(inplace=False),
         )
         self.unfold = nn.Unfold(kernel_size=1, padding=0, stride=1)# Every visual word at the stem stage corresponds to 2x2 pixel area of the original image
-
     def forward(self, x):
         B, C, H, W = x.shape
-        H_out, W_out = H // 8, W // 8
-        H_in, W_in = 4, 4
-        # Every visual sentence is composed of 4x4 visual words, and at the stem stage each visual sentence corresponds to 8x8 pixel area of the original image
-        x = self.common_conv(x)
+        x = self.common_conv(x)     
+        H_out, W_out = H // 8, W // 8  # Each visual sentence corresponds to 8x8 pixel area of the original image
+        H_in, W_in = 4, 4 # Every visual sentence is composed of 4x4 visual words
         # inner_tokens
         inner_tokens = self.inner_convs(x) # B, C, H, W
         inner_tokens = self.unfold(inner_tokens).transpose(1, 2) # B, N, Ck2
@@ -452,7 +450,6 @@ class Stem(nn.Module):
         outer_tokens = self.outer_convs(x) # B, C, H_out, W_out
         outer_tokens = outer_tokens.permute(0, 2, 3, 1).reshape(B, H_out * W_out, -1)
         return inner_tokens, outer_tokens, (H_out, W_out), (H_in, W_in)
-
 
 class Stage(nn.Module):
     """ PyramidTNT stage
