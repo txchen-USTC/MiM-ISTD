@@ -2,7 +2,11 @@ Official pytorch code of our paper "MiM-ISTD: Mamba-in-Mamba for Efficient Infra
 
 http://arxiv.org/abs/2403.02148
 
-We have corrected some errors and updated the whole network structure code of our MiM-ISTD. Feel free to use it, especially to more other tasks!
+## News
+
+*24-03-15. We have corrected some errors and updated the whole network structure code of our MiM-ISTD. Feel free to use it, especially to more other tasks!
+
+*24-03-08. Our paper has been released on arXiv.
 
 ![image](https://github.com/txchen-USTC/MiM-ISTD/blob/main/overview.jpg)
 
