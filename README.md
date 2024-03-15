@@ -4,9 +4,9 @@ http://arxiv.org/abs/2403.02148
 
 ## News
 
-*24-03-15. We have corrected some errors and updated the whole network structure code of our MiM-ISTD. Feel free to use it, especially to more other tasks!
+* 24-03-15. We have corrected some errors and updated the whole network structure code of our MiM-ISTD. Feel free to use it, especially to more other tasks!
 
-*24-03-08. Our paper has been released on arXiv.
+* 24-03-08. Our paper has been released on arXiv.
 
 ![image](https://github.com/txchen-USTC/MiM-ISTD/blob/main/overview.jpg)
 
