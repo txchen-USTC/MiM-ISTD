@@ -1,6 +1,8 @@
-Official pytorch code of our paper "MiM-ISTD: Mamba-in-Mamba for Efficient Infrared Small Target Detection".
+Official pytorch code of our paper "MiM-ISTD: Mamba-in-Mamba for Efficient Infrared Small Target Detection". 
 
 http://arxiv.org/abs/2403.02148
+
+We have corrected some errors and updated the whole network structure code of our MiM-ISTD. Feel free to use it, especially to more other tasks!
 
 ![image](https://github.com/txchen-USTC/MiM-ISTD/blob/main/overview.jpg)
 
