@@ -383,11 +383,10 @@ class PatchMerging2D_word(nn.Module):
             SHAPE_FIX[0] = H // 2
             SHAPE_FIX[1] = W // 2
 
-        # patch merge
-        x1 = x[:, 0::2, 0::2, :, :, :]  # B, H/2, W/2, H_in, W_in, C
-        x2 = x[:, 1::2, 0::2, :, :, :]
-        x3 = x[:, 0::2, 1::2, :, :, :]
-        x4 = x[:, 1::2, 1::2, :, :, :]
+        x0 = x[:, 0::2, 0::2, :]  # B H/2 W/2 C
+        x1 = x[:, 1::2, 0::2, :]  # B H/2 W/2 C
+        x2 = x[:, 0::2, 1::2, :]  # B H/2 W/2 C
+        x3 = x[:, 1::2, 1::2, :]  # B H/2 W/2 C
 
         if SHAPE_FIX[0] > 0:
             x0 = x0[:, :SHAPE_FIX[0], :SHAPE_FIX[1], :]
@@ -395,7 +394,7 @@ class PatchMerging2D_word(nn.Module):
             x2 = x2[:, :SHAPE_FIX[0], :SHAPE_FIX[1], :]
             x3 = x3[:, :SHAPE_FIX[0], :SHAPE_FIX[1], :]
 
-        x = torch.cat([torch.cat([x1, x2], 3), torch.cat([x3, x4], 3)], 4) # B, H/2, W/2, 2*H_in, 2*W_in, C
+        x = torch.cat([torch.cat([x0, x1], 3), torch.cat([x2, x3], 3)], 4) # B, H/2, W/2, 2*H_in, 2*W_in, C
         x = x.reshape(-1, 2*H_in, 2*W_in, C).permute(0, 3, 1, 2) # B_N/4, C, 2*H_in, 2*W_in
         x = self.conv(x)  # B_N/4, C, H_in, W_in
         x = x.reshape(-1, self.dim_out, M).transpose(1, 2)
@@ -544,7 +543,7 @@ class PyramidMiM_enc(nn.Module):
         self.stages = nn.ModuleList([])
         for i in range(4):
             if i > 0:
-                self.word_merges.append(PatchMerging2D_word(inner_dims[i-1], inner_dims[i], stride=2))
+                self.word_merges.append(PatchMerging2D_word(inner_dims[i-1], inner_dims[i]))
                 self.sentence_merges.append(PatchMerging2D_sentence(outer_dims[i-1]))
             self.stages.append(Stage(depths[i], outer_dim=outer_dims[i], inner_dim=inner_dims[i],
                         outer_head=outer_heads[i], inner_head=inner_heads[i],
