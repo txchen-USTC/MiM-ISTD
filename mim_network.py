@@ -366,7 +366,7 @@ class PatchMerging2D_word(nn.Module):
             nn.Conv2d(dim_in, dim_out, kernel_size=2*stride-1, padding=stride-1, stride=stride),
         )
 
-    def forward(self, x, H_out, W_out, H_in, W_in):#(b,h,w,c)->(b,h/2,w/2,2c)
+    def forward(self, x, H_out, W_out, H_in, W_in):
         B_N, M, C = x.shape # B*N, M, C
         x = self.norm(x)
         x = x.reshape(-1, H_out, W_out, H_in, W_in, C)
