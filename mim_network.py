@@ -288,9 +288,9 @@ class Block(nn.Module):
             # Inner
             self.inner_norm1 = norm_layer(num_words * inner_dim)
             self.inner_attn = SS2D(d_model=inner_dim, dropout=0, d_state=16)
-            self.inner_norm2 = norm_layer(num_words * inner_dim)
-            self.inner_mlp = Mlp(in_features=inner_dim, hidden_features=int(inner_dim * mlp_ratio),
-                                 out_features=inner_dim, act_layer=act_layer, drop=drop)
+            # self.inner_norm2 = norm_layer(num_words * inner_dim)
+            # self.inner_mlp = Mlp(in_features=inner_dim, hidden_features=int(inner_dim * mlp_ratio),
+            #                      out_features=inner_dim, act_layer=act_layer, drop=drop)
 
             self.proj_norm1 = norm_layer(num_words * inner_dim)
             self.proj = nn.Linear(num_words * inner_dim, outer_dim, bias=False)
@@ -300,19 +300,19 @@ class Block(nn.Module):
 
         self.outer_attn = SS2D(d_model=outer_dim, dropout=0, d_state=16)
         self.drop_path = DropPath(drop_path) if drop_path > 0. else nn.Identity()
-        self.outer_norm2 = norm_layer(outer_dim)
-        self.outer_mlp = Mlp(in_features=outer_dim, hidden_features=int(outer_dim * mlp_ratio),
-                             out_features=outer_dim, act_layer=act_layer, drop=drop)
+        # self.outer_norm2 = norm_layer(outer_dim)
+        # self.outer_mlp = Mlp(in_features=outer_dim, hidden_features=int(outer_dim * mlp_ratio),
+        #                      out_features=outer_dim, act_layer=act_layer, drop=drop)
 
     def forward(self, x, outer_tokens, H_out, W_out, H_in, W_in, relative_pos):
         B, N, C = outer_tokens.size()
         #print('outer_tokens input',outer_tokens.shape)
         if self.has_inner:
             x = x + self.drop_path(self.inner_attn(self.inner_norm1(x.reshape(B, N, -1)).reshape(B*N, H_in*W_in, -1), H_in, W_in)) # B*N, k*k, c
-            x = x + self.drop_path(self.inner_mlp(self.inner_norm2(x.reshape(B, N, -1)).reshape(B*N, H_in*W_in, -1))) # B*N, k*k, c
+            #x = x + self.drop_path(self.inner_mlp(self.inner_norm2(x.reshape(B, N, -1)).reshape(B*N, H_in*W_in, -1))) # B*N, k*k, c
             outer_tokens = outer_tokens + self.proj_norm2(self.proj(self.proj_norm1(x.reshape(B, N, -1)))) # B, N, C
         outer_tokens = outer_tokens + self.drop_path(self.outer_attn(self.outer_norm1(outer_tokens), H_out, W_out, relative_pos))
-        outer_tokens = outer_tokens + self.drop_path(self.outer_mlp(self.outer_norm2(outer_tokens)))
+        #outer_tokens = outer_tokens + self.drop_path(self.outer_mlp(self.outer_norm2(outer_tokens)))
         return x, outer_tokens
 
 
