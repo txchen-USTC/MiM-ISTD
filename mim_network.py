@@ -453,12 +453,13 @@ class Stem(nn.Module):
             nn.BatchNorm2d(outer_dim),
             nn.ReLU(inplace=False),
         )
-        self.unfold = nn.Unfold(kernel_size=1, padding=0, stride=1)# Every visual word at the stem stage corresponds to 2x2 pixel area of the original image
+        self.unfold = nn.Unfold(kernel_size=4, padding=0, stride=4)
+        
     def forward(self, x):
         B, C, H, W = x.shape
         x = self.common_conv(x)     
         H_out, W_out = H // 8, W // 8  # Each visual sentence corresponds to 8x8 pixel area of the original image
-        H_in, W_in = 4, 4 # Every visual sentence is composed of 4x4 visual words
+        H_in, W_in = 4, 4 # Every visual sentence is composed of 4x4 visual words, Every visual word at the stem stage corresponds to 2x2 pixel area of the original image
         # inner_tokens
         inner_tokens = self.inner_convs(x) # B, C, H, W
         inner_tokens = self.unfold(inner_tokens).transpose(1, 2) # B, N, Ck2
