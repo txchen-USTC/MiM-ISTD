@@ -275,6 +275,77 @@ class Mlp(nn.Module):
         x = self.drop(x)
         return x
 
+def make_pairs(x):
+    """make the int -> tuple 
+    """
+    return x if isinstance(x, tuple) else (x, x)
+
+class InvertedResidualFeedForward(nn.Module):
+    def __init__(self, dim, dim_ratio=2.):
+        super(InvertedResidualFeedForward, self).__init__()
+        output_dim = int(dim_ratio * dim)
+        self.conv1x1_gelu_bn = ConvGeluBN(
+            in_channel=dim,
+            out_channel=output_dim,
+            kernel_size=1,
+            stride_size=1,
+            padding=0
+        )
+        self.conv3x3_dw = ConvDW3x3(dim=output_dim)  
+        self.act = nn.Sequential(
+            nn.GELU(),
+            nn.BatchNorm2d(output_dim)
+        )
+        self.conv1x1_pw = nn.Sequential(
+            nn.Conv2d(output_dim, dim, 1, 1, 0),
+            nn.BatchNorm2d(dim)
+        )
+        
+    def forward(self, x):
+        x = self.conv1x1_gelu_bn(x)
+        out = x + self.act(self.conv3x3_dw(x))
+        out = self.conv1x1_pw(out)
+        return out 
+
+
+class ConvDW3x3(nn.Module):
+    def __init__(self, dim, kernel_size=3):
+        super(ConvDW3x3, self).__init__()
+        self.conv = nn.Conv2d(
+            in_channels=dim, 
+            out_channels=dim, 
+            kernel_size=make_pairs(kernel_size),
+            padding=make_pairs(1),
+            groups=dim)
+    
+    def forward(self, x):
+        x = self.conv(x)
+        return x 
+
+
+class ConvGeluBN(nn.Module):
+    def __init__(self, in_channel, out_channel, kernel_size, stride_size, padding=1):
+        """build the conv3x3 + gelu + bn module
+        """
+        super(ConvGeluBN, self).__init__()
+        self.kernel_size = make_pairs(kernel_size)
+        self.stride_size = make_pairs(stride_size)
+        self.padding_size = make_pairs(padding)
+        self.in_channel = in_channel
+        self.out_channel = out_channel 
+        self.conv3x3_gelu_bn = nn.Sequential(
+            nn.Conv2d(in_channels=self.in_channel,
+                      out_channels=self.out_channel,
+                      kernel_size=self.kernel_size,
+                      stride=self.stride_size,
+                      padding=self.padding_size),
+            nn.GELU(),
+            nn.BatchNorm2d(self.out_channel)
+        )
+
+    def forward(self, x):
+        x = self.conv3x3_gelu_bn(x)
+        return x 
 
 class Block(nn.Module):
     """ MiM-ISTD Block
@@ -288,7 +359,8 @@ class Block(nn.Module):
             # Inner
             self.inner_norm1 = norm_layer(num_words * inner_dim)
             self.inner_attn = SS2D(d_model=inner_dim, dropout=0, d_state=16)
-            # self.inner_norm2 = norm_layer(num_words * inner_dim)
+            self.inner_norm2 = norm_layer(num_words * inner_dim)
+            self.inner_mlp = InvertedResidualFeedForward(inner_dim)
             # self.inner_mlp = Mlp(in_features=inner_dim, hidden_features=int(inner_dim * mlp_ratio),
             #                      out_features=inner_dim, act_layer=act_layer, drop=drop)
 
@@ -300,7 +372,8 @@ class Block(nn.Module):
 
         self.outer_attn = SS2D(d_model=outer_dim, dropout=0, d_state=16)
         self.drop_path = DropPath(drop_path) if drop_path > 0. else nn.Identity()
-        # self.outer_norm2 = norm_layer(outer_dim)
+        self.outer_norm2 = norm_layer(outer_dim)
+        self.outer_mlp = InvertedResidualFeedForward(outer_dim)
         # self.outer_mlp = Mlp(in_features=outer_dim, hidden_features=int(outer_dim * mlp_ratio),
         #                      out_features=outer_dim, act_layer=act_layer, drop=drop)
 
@@ -309,10 +382,15 @@ class Block(nn.Module):
         #print('outer_tokens input',outer_tokens.shape)
         if self.has_inner:
             x = x + self.drop_path(self.inner_attn(self.inner_norm1(x.reshape(B, N, -1)).reshape(B*N, H_in*W_in, -1), H_in, W_in)) # B*N, k*k, c
+            mid=self.inner_norm2(x.reshape(B, N, -1)).reshape(B*N, H_in*W_in, -1)
+            mid=mid.reshape(B,mid.size(-1),int(math.sqrt(N*H_in*W_in)),int(math.sqrt(N*H_in*W_in)))
+            x = x + self.drop_path(self.inner_mlp(mid).reshape(B*N, H_in*W_in, -1)).reshape(B*N, H_in*W_in, -1)
             #x = x + self.drop_path(self.inner_mlp(self.inner_norm2(x.reshape(B, N, -1)).reshape(B*N, H_in*W_in, -1))) # B*N, k*k, c
             outer_tokens = outer_tokens + self.proj_norm2(self.proj(self.proj_norm1(x.reshape(B, N, -1)))) # B, N, C
         outer_tokens = outer_tokens + self.drop_path(self.outer_attn(self.outer_norm1(outer_tokens), H_out, W_out, relative_pos))
-        #outer_tokens = outer_tokens + self.drop_path(self.outer_mlp(self.outer_norm2(outer_tokens)))
+        mid_out=self.outer_norm2(outer_tokens)
+        mid_out=mid_out.reshape(B,mid_out.size(-1),int(math.sqrt(N)),int(math.sqrt(N)))
+        outer_tokens = outer_tokens + self.drop_path(self.outer_mlp(mid_out).reshape(B,N,C))
         return x, outer_tokens
 
 
@@ -541,8 +619,8 @@ class PyramidMiM_enc(nn.Module):
                 qk_scale=None, drop_rate=0., attn_drop_rate=0., drop_path_rate=0., norm_layer=nn.LayerNorm, se=0):
         super().__init__()
         self.num_classes = num_classes
-        depths = [2, 4, 9, 2]
-        outer_dims = [16, 16*2, 16*4, 16*8]
+        depths = [2, 2, 2, 2]
+        outer_dims = [32, 32*2, 32*4, 32*8]
         inner_dims = [4, 4*2, 4*4, 4*8]#  original mim-istd
         outer_heads = [2, 2*2, 2*4, 2*8]
         inner_heads = [1, 1*2, 1*4, 1*8]
