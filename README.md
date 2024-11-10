@@ -1,20 +1,30 @@
-Official pytorch code of our paper "MiM-ISTD: Mamba-in-Mamba for Efficient Infrared Small Target Detection". 
+Official pytorch code of our TGRS 2024 paper "MiM-ISTD: Mamba-in-Mamba for Efficient Infrared Small Target Detection". 
 
-http://arxiv.org/abs/2403.02148
+[http://arxiv.org/abs/2403.02148](https://ieeexplore.ieee.org/abstract/document/10740056)
 
 ## News
 
+* 24-11-01. Our paper get published in IEEE Transactions on Geoscience and Remote Sensing [IF=7.5].
+* 
 * 24-03-15. We have corrected some errors and updated the whole network structure code of our MiM-ISTD. Feel free to use it, especially to more other tasks!
 
 * 24-03-08. Our paper has been released on arXiv.
 
 ## A Quick Overview
 
-![image](https://github.com/txchen-USTC/MiM-ISTD/blob/main/overview.jpg)
+![image](https://github.com/txchen-USTC/MiM-ISTD/blob/main/asset/overview.jpg)
 
 ## Efficiency Advantages
 
-![image](https://github.com/txchen-USTC/MiM-ISTD/blob/main/efficiency.jpg)
+![image](https://github.com/txchen-USTC/MiM-ISTD/blob/main/asset/efficiency.jpg)
+
+## Detailed structure of our Mamba-in-Mamba design
+
+![image](https://github.com/txchen-USTC/MiM-ISTD/blob/main/asset/structure.jpg)
+
+## Performance Comparison
+
+![image](https://github.com/txchen-USTC/MiM-ISTD/blob/main/asset/performance.jpg)
 
 ## Required Environments
 
@@ -37,12 +47,12 @@ The .whl files of causal_conv1d and mamba_ssm could be found here. {[Baidu](http
 ## Citation
 
 Please cite our paper if you find the repository helpful.
-
 ```
 @article{chen2024mim,
-  title={MiM-ISTD: Mamba-in-Mamba for Efficient Infrared Small Target Detection},
-  author={Chen, Tianxiang and Tan, Zhentao and Gong, Tao and Chu, Qi and Wu, Yue and Liu, Bin and Ye, Jieping and Yu, Nenghai},
-  journal={arXiv preprint arXiv:2403.02148},
-  year={2024}
+  title={Mim-istd: Mamba-in-mamba for efficient infrared small target detection},
+  author={Chen, Tianxiang and Ye, Zi and Tan, Zhentao and Gong, Tao and Wu, Yue and Chu, Qi and Liu, Bin and Yu, Nenghai and Ye, Jieping},
+  journal={IEEE Transactions on Geoscience and Remote Sensing},
+  year={2024},
+  publisher={IEEE}
 }
 ```
