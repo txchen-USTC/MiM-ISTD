@@ -1,11 +1,11 @@
 Official pytorch code of our TGRS 2024 paper "MiM-ISTD: Mamba-in-Mamba for Efficient Infrared Small Target Detection". 
 
-[http://arxiv.org/abs/2403.02148](https://ieeexplore.ieee.org/abstract/document/10740056)
+[https://ieeexplore.ieee.org/abstract/document/10740056]
 
 ## News
 
 * 24-11-01. Our paper get published in IEEE Transactions on Geoscience and Remote Sensing [IF=7.5].
-* 
+  
 * 24-03-15. We have corrected some errors and updated the whole network structure code of our MiM-ISTD. Feel free to use it, especially to more other tasks!
 
 * 24-03-08. Our paper has been released on arXiv.
