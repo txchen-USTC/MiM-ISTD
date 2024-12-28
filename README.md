@@ -46,7 +46,7 @@ The .whl files of causal_conv1d and mamba_ssm could be found here. {[Baidu](http
 
 ## Checkpoint
 
-A newly retrained MiM checkpoint that maintains relatively high accuracy (around 80% IoU) on the SIRST dataset is available at Baidu Disk: {[Baidu](https://pan.baidu.com/s/1fyxlTmKG4HMvG07jrvoZIQ)}, extraction code: 3915. 
+A newly retrained MiM checkpoint that maintains relatively high accuracy (around 80% IoU) on the SIRST dataset is available at Baidu Disk: {[Baidu](https://pan.baidu.com/s/13g2v_M9tPxq_ze02fpaYGw)}, extraction code: DY4h. 
 
 ## Citation
 
